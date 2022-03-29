@@ -1,0 +1,421 @@
+library("openxlsx")
+#_______________________________________________________________________________
+#Below are codes for the data with 0 Nitrogen values
+path1<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen VS Two Index August 26 2020.xlsx"
+August26Data<-read.xlsx(path1,sheet= 1, colNames = TRUE)
+dim(August26Data)
+head(August26Data)
+str(August26Data)
+summary(August26Data)
+cor.test(August26Data$NITROGENC,August26Data$MeanNDVI)
+cor.test(August26Data$NITROGENC,August26Data$MeanNDRE)
+plot(August26Data$NITROGENC,August26Data$MEANNDRE, main="NDRE Scatterplot", 
+     xlab="Nitrogen", ylab="NDRE", pch=19)
+
+path2<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen VS Two Index July 29 2020.xlsx"
+July29Data<-read.xlsx(path2,sheet= 1, colNames = TRUE)
+dim(July29Data)
+head(July29Data)
+str(July29Data)
+cor.test(July29Data$NITROGENC,July29Data$MeanNDVI,use = "complete.obs")
+is.na(July29Data)
+is.na(July29Data$NITROGENC)
+is.na(July29Data$MEANNDVI)
+cor.test(July29Data$NITROGENC,July29Data$MeanNDRE)
+cor.test(July29Data$NITROGENC, July29Data$MEANNDVI)
+cor.test(July29Data$NITROGENC, July29Data$MEANNDRE)
+path3<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen VS Two Index October 15 2020.xlsx"
+October15Data<-read.xlsx(path3,sheet= 1, colNames = TRUE)
+cor.test(October15Data$NITROGENC,October15Data$MEANNDVI)
+cor.test(October15Data$NITROGENC,October15Data$MEANNDRE)
+plot(July29Data$NITROGENC,July29Data$MEANNDRE, main="NDRE Scatterplot", 
+     xlab="Nitrogen", ylab="NDRE", pch=19)
+abline(lm(July29Data$NITROGENC~July29Data$MEANNDRE), col="red") # regression line (y~x)
+lines(lowess(July29Data$NITROGENC~July29Data$MEANNDRE), col="blue") # lowess line (x,y)
+#_______________________________________________________________________________
+#starting from here are codes for the data removing 0 Nitrogen values
+path11<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen VS Two Index August 26 2020 Remove 0.xlsx"
+August26Data_No0<-read.xlsx(path11,sheet= 1, colNames = TRUE)
+cor.test(August26Data_No0$NITROGENC,August26Data_No0$MeanNDVI)
+cor.test(August26Data$NITROGENC,August26Data$MeanNDRE)
+dim(August26Data_No0)
+cor.test(August26Data_No0$NITROGENC,August26Data_No0$MeanNDRE)
+path22<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen VS Two Index July 29 2020 Remove 0.xlsx"
+July29Data_No0<-read.xlsx(path22,sheet= 1, colNames = TRUE)
+dim(July29Data_No0)
+cor.test(July29Data_No0$NITROGENC, July29Data_No0$MEANNDVI)
+cor.test(July29Data_No0$NITROGENC, July29Data_No0$MEANNDRE)
+path33<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen VS Two Index October 15 2020 Remove 0.xlsx"
+October15Data_No0<-read.xlsx(path33,sheet= 1, colNames = TRUE)
+cor.test(October15Data_No0$NITROGENC,October15Data_No0$MEANNDVI)
+cor.test(October15Data_No0$NITROGENC,October15Data_No0$MEANNDRE)
+#_______________________________________________________________________________
+#linear model with NDVI and NDRE
+fitlm<-lm(NITROGENC~ MEANNDVI + MEANNDRE, July29Data_No0, na.action,
+          method = "qr", model = TRUE, x = FALSE, y = FALSE, qr = TRUE,
+          singular.ok = TRUE, contrasts = NULL)
+fitlm<-lm(NITROGENC~ MEANNDVI + MEANNDRE, July29Data_No0, 
+          method = "qr")
+summary(fitlm)
+fitlm<-lm(NITROGENC~ MEANNDVI + MEANNDRE, July29Data_No0)
+summary(fitlm)
+path4<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen VS Two Index October 15 2020.xlsx"
+
+#_______________________________________________________________________________
+### New method Developed on April 21 2021.
+### July 29 2021 Data with 10cm Buffer
+### Nitrogen and Lignin
+### 0 Nitrogen removed
+path5<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen_and_Lignin_Analysis_July_29_2020_UsefulFields.dbf.xlsx"
+July29NewData_No0<-read.xlsx(path5,sheet= 2, colNames = TRUE)
+dim(July29NewData_No0)
+str(July29NewData_No0)
+#_________________________________________________________________
+cor.test(July29NewData_No0$Lignin_PDB, July29NewData_No0$MEANNDVI)
+cor.test(July29NewData_No0$Lignin_PDB, July29NewData_No0$MEANNDRE)
+#_______________________________________________________________________________
+###########################################################################
+###########################################################################
+### New method Developed on May 04 2021.
+### July 29 2021 Data with 10cm Buffer
+### Nitrogen and Lignin
+### 0 Nitrogen removed
+### Borrow concept from Rust, only try the nitrogen with the "low" and "high" in nitrogen contents
+###########################################################################
+#####Notes:this method is not approvde by the team, because treating the records with "low" and "high" 
+#####in nitrogen contents is not scientifically right. 
+###########################################################################
+### For "low" group
+# Still use path5,adding one more sheet "NitrogenCLow" to path5 excel file and use it as the data.
+July29NewData_No0_Low<-read.xlsx(path5,sheet= 3, colNames = TRUE)
+dim(July29NewData_No0_Low)
+str(July29NewData_No0_Low)
+#_________________________________________________________________
+cor.test(July29NewData_No0_Low$NITROGENC, July29NewData_No0_Low$MEANNDVI)
+cor.test(July29NewData_No0_Low$NITROGENC, July29NewData_No0_Low$MEANNDRE)
+cor.test(July29NewData_No0_Low$NITROGENC, July29NewData_No0_Low$MINNDRE)
+### For "high" group
+# Still use path5,adding one more sheet "NitrogenCHigh" to path5 excel file and use it as the data.
+July29NewData_No0_High<-read.xlsx(path5,sheet= 4, colNames = TRUE)
+dim(July29NewData_No0_High)
+str(July29NewData_No0_High)
+head(July29NewData_No0_High)
+###note: NitrogenCHigh yield the best results for nitrogen.
+
+#_________________________________________________________________
+cor.test(July29NewData_No0_High$NITROGENC, July29NewData_No0_High$MEANNDVI)
+cor.test(July29NewData_No0_High$NITROGENC, July29NewData_No0_High$MEANNDRE)
+### For "high" group 2, with only 30 records
+# Still use path5,adding one more sheet "NitrogenCHigh2" to path5 excel file and use it as the data.
+July29NewData_No0_High2<-read.xlsx(path5,sheet= 5, colNames = TRUE)
+dim(July29NewData_No0_High2)
+str(July29NewData_No0_High2)
+head(July29NewData_No0_High2)
+#_________________________________________________________________
+cor.test(July29NewData_No0_High2$NITROGENC, July29NewData_No0_High2$MEANNDVI)
+cor.test(July29NewData_No0_High2$NITROGENC, July29NewData_No0_High2$MEANNDRE)
+### For "high" group 3, with 90 records
+# Still use path5, adding one more sheet "NitrogenCHigh3" to path5 excel file and use it as the data.
+July29NewData_No0_High3<-read.xlsx(path5,sheet= 6, colNames = TRUE)
+dim(July29NewData_No0_High3)
+str(July29NewData_No0_High3)
+head(July29NewData_No0_High3)
+#_________________________________________________________________
+cor.test(July29NewData_No0_High3$NITROGENC, July29NewData_No0_High3$MEANNDVI)
+cor.test(July29NewData_No0_High3$NITROGENC, July29NewData_No0_High3$MEANNDRE)
+
+#______________________________________________________________________________
+#______________________________________________________________________________
+###Lignin
+###Lignin High
+July29NewData_No0_LigninHigh<-read.xlsx(path5,sheet= 9, colNames = TRUE)
+cor.test(July29NewData_No0_LigninHigh$Lignin_PDB, July29NewData_No0_LigninHigh$MEANNDVI)
+cor.test(July29NewData_No0_LigninHigh$Lignin_PDB, July29NewData_No0_LigninHigh$MEANNDRE)
+
+###Lignin Low
+July29NewData_No0_LigninLow<-read.xlsx(path5,sheet= 8, colNames = TRUE)
+cor.test(July29NewData_No0_LigninLow$Lignin_PDB, July29NewData_No0_LigninLow$MEANNDVI)
+cor.test(July29NewData_No0_LigninLow$Lignin_PDB, July29NewData_No0_LigninLow$MEANNDRE)
+
+###May_17_2021
+install.packages("bannerCommenter")
+library(bannerCommenter)
+banner("May_17_2021 Analysis:", "End-of-Season (November_10_2020) Nitrogen", emph = TRUE)
+###########################################################################
+###########################################################################
+###                                                                     ###
+###                        MAY_17_2021 ANALYSIS:                        ###
+###              END-OF-SEASON (NOVEMBER_10_2020) NITROGEN              ###
+###                                                                     ###
+###########################################################################
+###########################################################################
+path6<-"D:/Yaping Xu/CBI/Analysis/Nitrogen/Nitrogen Ground VS NDRE_NDVI Novermber_05_2020.xlsx"
+November_05_2020Data<-read.xlsx(path6,sheet= 1, colNames = TRUE)
+#__________________________________________________________________________
+#below is the code for removing 0 N and Ligin values
+library(dplyr)
+November_05_2020Data_0Removed<-filter(November_05_2020Data,November_05_2020Data$N_end_seas>0)
+#__________________________________________________________________________
+#below is the correlation for the whole dataset
+cor.test(November_05_2020Data_0Removed$N_end_seas, November_05_2020Data_0Removed$NDREMEAN)
+cor.test(November_05_2020Data_0Removed$N_end_seas, November_05_2020Data_0Removed$NDVIMEAN)
+plot(November_05_2020Data_0Removed$N_end_seas, November_05_2020Data_0Removed$NDVIMEAN)
+fitglm<-glm(November_05_2020Data_0Removed$N_end_seas~November_05_2020Data_0Removed$NDVIMEAN)
+summary(fitglm)
+print(fitglm)
+1-26.68/27.02
+fitlm_end_NDVI<-lm(November_05_2020Data_0Removed$N_end_seas~November_05_2020Data_0Removed$NDVIMEAN)
+summary(fitlm_end_NDVI)
+#__________________________________________________________________________
+#below is the code for grouped nitrogen by low/mod
+#First group, low nitrogen application lowN1
+head(November_05_2020Data_0Removed)
+November_05_2020Data_0Removed_lowN1<-filter(November_05_2020Data_0Removed,Nitrogen=="Low_N1")
+cor.test(November_05_2020Data_0Removed_lowN1$N_end_seas, November_05_2020Data_0Removed_lowN1$NDREMEAN)
+cor.test(November_05_2020Data_0Removed_lowN1$N_end_seas, November_05_2020Data_0Removed_lowN1$NDVIMEAN)
+#__________________________________________________________________________
+#Second group, low nitrogen application lowN2
+November_05_2020Data_0Removed_lowN2<-filter(November_05_2020Data_0Removed,Nitrogen=="Low_N2")
+cor.test(November_05_2020Data_0Removed_lowN2$N_end_seas, November_05_2020Data_0Removed_lowN2$NDREMEAN)
+cor.test(November_05_2020Data_0Removed_lowN2$N_end_seas, November_05_2020Data_0Removed_lowN2$NDVIMEAN)
+#__________________________________________________________________________
+#Third group, mod nitrogen application Mod_N1
+November_05_2020Data_0Removed_modN1<-filter(November_05_2020Data_0Removed,Nitrogen=="Mod_N1")
+cor.test(November_05_2020Data_0Removed_modN1$N_end_seas, November_05_2020Data_0Removed_modN1$NDREMEAN)
+cor.test(November_05_2020Data_0Removed_modN1$N_end_seas, November_05_2020Data_0Removed_modN1$NDVIMEAN)
+#__________________________________________________________________________
+#Fourth group, mod nitrogen application Mod_N2
+November_05_2020Data_0Removed_modN2<-filter(November_05_2020Data_0Removed,Nitrogen=="Mod_N2")
+cor.test(November_05_2020Data_0Removed_modN2$N_end_seas, November_05_2020Data_0Removed_modN2$NDREMEAN)
+cor.test(November_05_2020Data_0Removed_modN2$N_end_seas, November_05_2020Data_0Removed_modN2$NDVIMEAN)
+dim(November_05_2020Data)
+dim(November_05_2020Data_0Removed)
+
+#____________________________________________________________________________________________
+#polynormial regression
+fitpoly<-lm(N_end_seas ~ poly(NDVIMEAN, 3, raw = TRUE), data = November_05_2020Data_0Removed)
+summary(fitpoly)
+fitpolyNDRE<-lm(N_end_seas ~ poly(NDREMEAN, 3, raw = TRUE), data = November_05_2020Data_0Removed)
+summary(fitpolyNDRE)
+#_____________________________
+install.packages("ggplot")
+library(ggplot2)
+install.packages("tidyverse")
+library(tidyverse)
+#_____________________________
+
+ggplot(November_05_2020Data_0Removed, aes(NDVIMEAN, N_end_seas) ) +
+  geom_point() +
+  stat_smooth(method = lm, formula = y ~ poly(x, 3, raw = TRUE))
+#_________________________________________________________________________
+#exponential transformation
+fitexp<-lm(N_end_seas ~ exp(NDVIMEAN), data = November_05_2020Data_0Removed)
+summary(fitexp)
+fitexpNDRE<-lm(N_end_seas ~ exp(NDREMEAN), data = November_05_2020Data_0Removed)
+summary(fitexpNDRE)
+#######exponential is a failure.
+
+#log transformation
+fitlogNDVI<-lm(N_end_seas ~ log(NDVIMEAN), data = November_05_2020Data_0Removed)
+summary(fitlogNDVI)
+fitlogNDRE<-lm(N_end_seas ~ log(NDREMEAN), data = November_05_2020Data_0Removed)
+summary(fitlogNDRE)
+#_______________________________________________
+#_______________________________________________
+#code for GAM (generalized additive model) model 
+install.packages("gam")
+library(gam)
+fitgam<-gam(N_end_seas ~ s(NDVIMEAN), data = November_05_2020Data_0Removed)
+## the above equation is y~s(x)
+summary(fitgam)
+##library caret is a powerful package for modeling
+install.packages("caret")
+library(caret)
+#______________________________________
+##split the data into training and test set: 70% traninng, 30% testing.
+training.samples <- November_05_2020Data_0Removed$N_end_seas %>%
+  createDataPartition(p = 0.7, list = FALSE)
+dim(training.samples)
+train.data <- November_05_2020Data_0Removed[training.samples, ]
+test.data <- November_05_2020Data_0Removed[-training.samples, ]
+dim(train.data)
+dim(test.data)
+dim(November_05_2020Data_0Removed)
+##Plot the GAM model for NDVI
+ggplot(train.data, aes(NDVIMEAN, N_end_seas) ) +
+  geom_point(colour = "#0072bd", size = 3, shape = 15) +
+  stat_smooth(method = "gam", formula = y ~ s(x))
+
+##build the model, predic with training data and print R-squared.
+#________________________________________________________________
+# ##notes: this code block is wrong,because training was built on the whole data set rather than the training set.
+# fitgam<-gam(N_end_seas ~ s(NDVIMEAN), data = November_05_2020Data_0Removed)
+# predictions_gam <- fitgam %>% predict(test.data)
+# data.frame(
+#   R2 = R2(predictions_gam, test.data$NDVIMEAN),
+#   RMSE = RMSE(predictions_gam, test.data$NDVIMEAN)
+#   )
+#___________________________________________________
+#This is the correct code block.
+fitgam2<-gam(N_end_seas ~ s(NDVIMEAN), train.data)
+predictions_gam2 <- fitgam2 %>% predict(test.data)
+#print out the R-squared and RMSE
+data.frame(
+  R2_GAM2 = R2(predictions_gam2, test.data$NDVIMEAN),
+  RMSE_GAM2 = RMSE(predictions_gam2, test.data$NDVIMEAN)
+)
+###If no RMSE needed, just print the R-squared:
+R2 = R2(predictions_gam2, test.data$NDVIMEAN)
+R2
+summary(predictions_gam2)
+
+
+
+
+##Plot the GAM model for NDRE
+ggplot(train.data, aes(NDREMEAN, N_end_seas) ) +
+  geom_point(colour = "#0072bd", size = 3, shape = 15) +
+  stat_smooth(method = "gam", formula = y ~ s(x))
+fitgam3<-gam(N_end_seas ~ s(NDREMEAN), data = November_05_2020Data_0Removed)
+predictions_gam3 <- fitgam3 %>% predict(test.data)
+data.frame(
+  R2_GAM3 = R2(predictions_gam3, test.data$NDREMEAN),
+  RMSE_GAM3 = RMSE(predictions_gam3, test.data$NDREMEAN)
+)
+R2 = R2(predictions_gam3, test.data$NDREMEAN)
+R2
+summary(fitgam3)
+sp<- ggplot(train.data, aes(NDREMEAN, N_end_seas) ) +
+  geom_point(colour = "#0072bd", size = 3, shape = 15) +
+  stat_smooth(method = "gam", formula = y ~ s(x))
+sp
+
+library(bannerCommenter)
+banner("August_18_2021 Analysis:", "End-of-Season (November_10_2020) Nitrogen", "ggplot for Log and Poly Linear Models", emph = TRUE)
+###########################################################################
+###########################################################################
+###                                                                     ###
+###                      AUGUST_18_2021 ANALYSIS:                       ###
+###              END-OF-SEASON (NOVEMBER_10_2020) NITROGEN              ###
+###                GGPLOT FOR LOG AND POLY LINEAR MODELS                ###
+###                                                                     ###
+###########################################################################
+###########################################################################
+sp2<- ggplot(test.data, aes(NDREMEAN, N_end_seas) ) +
+  geom_point(colour = "black", size = 3, shape = 1) +
+  stat_smooth(method = "gam", formula = y ~ s(x), color = "red")
+sp2
+sp2 + scale_x_continuous(name="NDRE") +
+  scale_y_continuous(name="Nitrogen Content End-of-Season")
+
+#_____________________________________________________________
+### Plot the models
+sp3<- ggplot(test.data, aes(NDREMEAN, N_end_seas) ) +
+  geom_point(colour = "black", size = 3, shape = 1) +
+  stat_smooth(method = "glm", formula = y ~ s(x), color = "red")
+sp3
+sp3 + scale_x_continuous(name="NDRE") +
+  scale_y_continuous(name="Nitrogen Content End-of-Season")
+#_______________________ 
+sp4<- ggplot(test.data, aes(NDREMEAN, N_end_seas) ) +
+  geom_point(colour = "black", size = 3, shape = 1) +
+  stat_smooth(method = "glm", formula = y ~ poly(x,2), color = "red")
+sp4
+sp4 + scale_x_continuous(name="NDRE") +
+  scale_y_continuous(name="Nitrogen Content End-of-Season")
+sp5<- ggplot(test.data, aes(NDREMEAN, N_end_seas) ) +
+  geom_point(colour = "black", size = 3, shape = 1) +
+  stat_smooth(method = "glm", formula = y ~ log(x), color = "red")
+sp5
+sp5 + scale_x_continuous(name="NDRE") +
+  scale_y_continuous(name="Nitrogen Content End-of-Season")
+
+####Add the ggplot for NDVI
+sp6<- ggplot(test.data, aes(NDVIMEAN, N_end_seas) ) +
+  geom_point(colour = "black", size = 3, shape = 1) +
+  stat_smooth(method = "glm", formula = y ~ x, color = "red")
+sp6
+sp7<- ggplot(test.data, aes(NDVIMEAN, N_end_seas) ) +
+  geom_point(colour = "black", size = 3, shape = 1) +
+  stat_smooth(method = "glm", formula = y ~ log(x), color = "red")
+sp7
+
+sp8<- ggplot(test.data, aes(NDVIMEAN, N_end_seas) ) +
+  geom_point(colour = "black", size = 3, shape = 1) +
+  stat_smooth(method = "glm", formula = y ~ poly(x,2), color = "red")
+sp8
+sp9<- ggplot(test.data, aes(NDVIMEAN, N_end_seas) ) +
+  geom_point(colour = "black", size = 3, shape = 1) +
+  stat_smooth(method = "gam", formula = y ~ s(x), color = "red")
+sp9
+
+
+library(bannerCommenter)
+banner("August_18_2021 Analysis:", "Mid-Season (November_10_2020) Nitrogen","NonLinear VS Linear", emph = TRUE)
+############################################################################
+############################################################################
+###                                                                      ###
+###                       AUGUST_18_2021 ANALYSIS:                       ###
+###                MID-SEASON (NOVEMBER_10_2020) NITROGEN                ###
+###                          NONLINEAR VS LINEAR                         ###
+###                                                                      ###
+############################################################################
+############################################################################
+dim(July29NewData_No0)
+str(July29NewData_No0)
+#______________________________________
+##split the data into training and test set: 70% traninng, 30% testing.
+training.samples_Mid <- July29NewData_No0$NITROGENC %>%
+  createDataPartition(p = 0.7, list = FALSE)
+dim(training.samples_Mid)
+train.data_Mid <- July29NewData_No0[training.samples, ]
+test.data_Mid <- July29NewData_No0[-training.samples, ]
+#Fit for GAM Model
+library(gam)
+library(caret)
+fitgam4<-gam(NITROGENC ~ s(MEANNDRE), data = train.data_Mid)
+predictions_gam4 <- fitgam4 %>% predict(test.data_Mid)
+
+#print out the R-squared and RMSE
+data.frame(
+  R2_GAM4 = R2(predictions_gam4, test.data_Mid$MEANNDRE),
+  RMSE_GAM4 = RMSE(predictions_gam4, test.data_Mid$MEANNDRE)
+)
+
+###NDVI for GAM
+fitgam5<-gam(NITROGENC ~ s(MEANNDVI), data = train.data_Mid)
+predictions_gam5 <- fitgam5 %>% predict(test.data_Mid)
+data.frame(
+  R2_GAM5 = R2(predictions_gam5, test.data_Mid$NITROGENC),
+  RMSE_GAM5 = RMSE(predictions_gam5, test.data_Mid$NITROGENC)
+)
+summary(fitgam5)
+
+#Linear models for NDRE
+fitpolyNDRE_Mid<-lm(NITROGENC ~ poly(MEANNDRE, 3, raw = TRUE), data = train.data_Mid)
+summary(fitpolyNDRE_Mid)
+fitlogNDRE_Mid<-lm(NITROGENC ~ log(MEANNDRE), data = train.data_Mid)
+summary(fitlogNDRE_Mid)
+fitlmNDRE_Mid<-lm(NITROGENC ~ MEANNDRE, data = train.data_Mid)
+summary(fitlmNDRE_Mid)
+#Linear models for NDVI
+fitpolyNDVI_Mid<-lm(NITROGENC ~ poly(MEANNDVI, 3, raw = TRUE), data = train.data_Mid)
+summary(fitpolyNDVI_Mid)
+fitlogNDVI_Mid<-lm(NITROGENC ~ log(MEANNDVI), data = train.data_Mid)
+summary(fitlogNDVI_Mid)
+fitlmNDVI_Mid<-lm(NITROGENC ~ MEANNDVI, data = train.data_Mid)
+summary(fitlmNDVI_Mid)
+#test
+fitpolyNDVI_Mid2<-glm(NITROGENC ~ poly(MEANNDVI, 3, raw = TRUE), data = train.data_Mid)
+summary(fitpolyNDVI_Mid2)
+fitlogNDVI_Mid2<-glm(NITROGENC ~ log(MEANNDVI), data = train.data_Mid)
+summary(fitlogNDVI_Mid2)
+fitlmNDVI_Mid2<-glm(NITROGENC ~ MEANNDVI, data = train.data_Mid)
+
+#test on prediction r2 and rmse
+predictions_lmNDVI_Mid2 <- fitlmNDVI_Mid2 %>% predict(test.data_Mid)
+summary(predictions_lmNDVI_Mid2)
+data.frame(
+  R2_lmNDVI_Mid2 = R2(predictions_lmNDVI_Mid2, test.data_Mid$NITROGENC),
+  RMSE_lmNDVI_Mid2 = RMSE(predictions_lmNDVI_Mid2, test.data_Mid$NITROGENC)
+)
