@@ -1,0 +1,64 @@
+library("openxlsx")
+path1<-"D:/Yaping Xu/CBI/Analysis/Chlorophyll AND Rust/July_29_2020/Consolidated(Summarized by Rust)/RustBestWorst_NDRE_July_29_2020_Consolidated.xlsx"
+July29Data_NDRE<-read.xlsx(path1,sheet= 1, colNames = TRUE)
+dim(July29Data_NDRE)
+str(July29Data_NDRE)
+head(July29Data_NDRE)
+summary(July29Data_NDRE)
+cor.test(July29Data_NDRE$Rust,July29Data_NDRE$MEAN_NDRE)
+plot(July29Data_NDRE$Rust,July29Data_NDRE$MEAN_NDRE, main="NDREVSRust Scatterplot", 
+     xlab="Rust", ylab="NDRE", pch=16)
+LinearModel<-lm(Rust~MEAN_NDRE,data = July29Data_NDRE)
+summary(LinearModel)
+plot(Rust~MEAN_NDRE,data = July29Data_NDRE)
+abline(LinearModel)
+library("ggplot2")
+ggplot(July29Data_NDRE, aes(x = Rust, y = MEAN_NDRE)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red")
+#_____________________________________________________________
+#Define a function that report the eq and p on plot, and plot the model
+ggplotRegression <- function (fit) {
+  
+  require(ggplot2)
+  
+  ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+    geom_point() +
+    stat_smooth(method = "lm", col = "red") +
+    labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                       "Intercept =",signif(fit$coef[[1]],5 ),
+                       " Slope =",signif(fit$coef[[2]], 5),
+                       " P =",signif(summary(fit)$coef[2,4], 5)))
+}
+ggplotRegression(LinearModel)
+
+#___________________________________________________________________
+#__________________________________________________________________
+#NDVI
+path2<-"D:/Yaping Xu/CBI/Analysis/Chlorophyll AND Rust/July_29_2020/Consolidated(Summarized by Rust)/RustBestWorst_NDVI_July_29_2020_Consolidated.xlsx"
+July29Data_NDVI<-read.xlsx(path2,sheet= 1, colNames = TRUE)
+cor.test(July29Data_NDVI$Rust,July29Data_NDVI$MEAN_NDVI)
+LinearModel2<-lm(Rust~MEAN_NDVI,data = July29Data_NDVI)
+summary(LinearModel2)
+ggplotRegression(LinearModel2)
+
+#___________________________________________________________________
+#__________________________________________________________________
+#CVI
+path3<-"D:/Yaping Xu/CBI/Analysis/Chlorophyll AND Rust/July_29_2020/Consolidated(Summarized by Rust)/RustBestWorst_CVI_July_29_2020_Consolidated.xlsx"
+July29Data_CVI<-read.xlsx(path3,sheet= 1, colNames = TRUE)
+cor.test(July29Data_CVI$Rust,July29Data_NDVI$MEAN_CVI)
+LinearModel3<-lm(Rust~MEAN_CVI,data = July29Data_CVI)
+summary(LinearModel3)
+ggplotRegression(LinearModel3)
+
+#___________________________________________________________________
+#__________________________________________________________________
+#CLRE
+path4<-"D:/Yaping Xu/CBI/Analysis/Chlorophyll AND Rust/July_29_2020/Consolidated(Summarized by Rust)/RustBestWorst_CLRE_July_29_2020_Consolidated.xlsx"
+July29Data_CLRE<-read.xlsx(path4,sheet= 1, colNames = TRUE)
+cor.test(July29Data_CLRE$Rust,July29Data_CLRE$MEAN_CLRE)
+LinearModel4<-lm(Rust~MEAN_CLRE,data = July29Data_CLRE)
+summary(LinearModel4)
+ggplotRegression(LinearModel4)
+
